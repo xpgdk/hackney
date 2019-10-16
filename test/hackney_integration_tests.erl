@@ -17,6 +17,7 @@ all_tests() ->
    absolute_redirect_request_follow(),
    relative_redirect_request_no_follow(),
    relative_redirect_request_follow(),
+   relative_redirect_request_with_query_params_follow(),
    test_duplicate_headers(),
    test_custom_host_headers(),
    async_request(),
@@ -130,6 +131,14 @@ relative_redirect_request_follow() ->
     Location = hackney:location(Client),
     [?_assertEqual(200, StatusCode),
      ?_assertEqual(<<"http://localhost:8000/get">>, Location)].
+
+relative_redirect_request_with_query_params_follow() ->
+    URL = <<"http://localhost:8000/redirect-to?url=/get%3Fparam=42">>,
+    Options = [{follow_redirect, true}],
+    {ok, StatusCode, _, Client} = hackney:request(get, URL, [], <<>>, Options),
+    Location = hackney:location(Client),
+    [?_assertEqual(200, StatusCode),
+     ?_assertEqual(<<"http://localhost:8000/get?param=42">>, Location)].
 
 async_request() ->
     URL = <<"http://localhost:8000/get">>,

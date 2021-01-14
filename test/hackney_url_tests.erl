@@ -19,6 +19,19 @@ parse_and_unparse_url_test_() ->
                           user = <<"">>,
                           password = <<"">>}
             },
+            {<<"http://www.example.com">>,
+             #hackney_url{transport =hackney_tcp,
+                          scheme = http,
+                          netloc = <<"www.example.com">>,
+                          raw_path = <<"">>,
+                          path = <<>>,
+                          qs = <<"">>,
+                          fragment = <<"">>,
+                          host = "www.example.com",
+                          port = 80,
+                          user = <<"">>,
+                          password = <<"">>}
+            },
             {<<"http://www.example.com/">>,
              #hackney_url{transport =hackney_tcp,
                           scheme = http,
@@ -110,6 +123,19 @@ parse_and_unparse_url_test_() ->
                           user = <<"user">>,
                           password = <<"passwd">>}
             },
+            {<<"https://user:pass%26word@www.example.com/path?key=value#Section%205">>,
+             #hackney_url{transport =hackney_ssl,
+                          scheme = https,
+                          netloc = <<"www.example.com">>,
+                          raw_path = <<"/path?key=value#Section%205">>,
+                          path = <<"/path">>,
+                          qs = <<"key=value">>,
+                          fragment = <<"Section%205">>,
+                          host = "www.example.com",
+                          port = 443,
+                          user = <<"user">>,
+                          password = <<"pass&word">>}
+            },
             {<<"https://user@www.example.com/path?key=value#Section%205">>,
              #hackney_url{transport =hackney_ssl,
                           scheme = https,
@@ -134,6 +160,19 @@ parse_and_unparse_url_test_() ->
                           host = "/var/run/test.sock",
                           port = 0,
                           user = <<"user">>,
+                          password = <<"">>}
+            },
+            {<<"http://example.com#-@127.2.2.2/232d40">>,
+             #hackney_url{transport =hackney_tcp,
+                          scheme = http,
+                          netloc = <<"example.com">>,
+                          raw_path = <<"#-@127.2.2.2/232d40">>,
+                          path = <<>>,
+                          qs = <<"">>,
+                          fragment = <<"-@127.2.2.2/232d40">>,
+                          host = "example.com",
+                          port = 80,
+                          user = <<"">>,
                           password = <<"">>}
             }
             ],
@@ -174,7 +213,7 @@ parse_url_test_() ->
                           scheme = http,
                           netloc = <<"www.example.com">>,
                           raw_path = <<"">>,
-                          path = <<"/">>,
+                          path = <<>>,
                           qs = <<"">>,
                           fragment = <<"">>,
                           host = "www.example.com",
@@ -187,10 +226,63 @@ parse_url_test_() ->
                           scheme = http,
                           netloc = <<"www.example.com">>,
                           raw_path = <<"?q=123">>,
-                          path = <<"/">>,
+                          path = <<>>,
                           qs = <<"q=123">>,
                           fragment = <<"">>,
                           host = "www.example.com",
+                          port = 80,
+                          user = <<"">>,
+                          password = <<"">>}
+            },
+            {<<"http://username:password@www.example.com">>,
+             #hackney_url{transport =hackney_tcp,
+                          scheme = http,
+                          netloc = <<"www.example.com">>,
+                          raw_path = <<"">>,
+                          path = <<>>,
+                          qs = <<"">>,
+                          fragment = <<"">>,
+                          host = "www.example.com",
+                          port = 80,
+                          user = <<"username">>,
+                          password = <<"password">>}
+            },
+            {<<"http://username:pass%20word@www.example.com">>,
+             #hackney_url{transport =hackney_tcp,
+                          scheme = http,
+                          netloc = <<"www.example.com">>,
+                          raw_path = <<"">>,
+                          path = <<>>,
+                          qs = <<"">>,
+                          fragment = <<"">>,
+                          host = "www.example.com",
+                          port = 80,
+                          user = <<"username">>,
+                          password = <<"pass word">>}
+            },
+            % From HTTP Basic Authentication RFC https://tools.ietf.org/html/rfc7617
+            {<<"http://Aladdin:open%20sesame@www.example.com">>,
+             #hackney_url{transport =hackney_tcp,
+                          scheme = http,
+                          netloc = <<"www.example.com">>,
+                          raw_path = <<"">>,
+                          path = <<>>,
+                          qs = <<"">>,
+                          fragment = <<"">>,
+                          host = "www.example.com",
+                          port = 80,
+                          user = <<"Aladdin">>,
+                          password = <<"open sesame">>}
+            },
+            {<<"http://example.com#-@127.2.2.2/232d40">>,
+             #hackney_url{transport =hackney_tcp,
+                          scheme = http,
+                          netloc = <<"example.com">>,
+                          raw_path = <<"#-@127.2.2.2/232d40">>,
+                          path = <<>>,
+                          qs = <<"">>,
+                          fragment = <<"-@127.2.2.2/232d40">>,
+                          host = "example.com",
                           port = 80,
                           user = <<"">>,
                           password = <<"">>}
@@ -209,9 +301,9 @@ transport_scheme_test_() ->
 url_encode_and_decode_test_() ->
     %% {Value, Result}.
     Tests = [
-            {<<"HelloGünter">>, <<"HelloG%c3%bcnter">>},
+            {<<"HelloGünter">>, <<"HelloG%C3%BCnter">>},
             {<<"Hello.-~_">>, <<"Hello.-~_">>},
-            {<<"€£©®ÀÁÂÃÄÅ">>, <<"%e2%82%ac%c2%a3%c2%a9%c2%ae%c3%80%c3%81%c3%82%c3%83%c3%84%c3%85">>}
+            {<<"€£©®ÀÁÂÃÄÅ">>, <<"%E2%82%AC%C2%A3%C2%A9%C2%AE%C3%80%C3%81%C3%82%C3%83%C3%84%C3%85">>}
             ],
     [{V, fun() -> R = hackney_url:urlencode(V) end} || {V, R} <- Tests] ++
     [{R, fun() -> V = hackney_url:urldecode(R) end} || {V, R} <- Tests].
@@ -219,8 +311,8 @@ url_encode_and_decode_test_() ->
 url_encode_test_() ->
     %% {{Url, Options}, Result}.
     Tests = [
-            {{<<"HelloGünter">>, [upper]}, <<"HelloG%C3%BCnter">>},
-            {{<<"Hello+Günter">>, []}, <<"Hello%2bG%c3%bcnter">>},
+            {{<<"HelloGünter">>, [lower]}, <<"HelloG%c3%bcnter">>},
+            {{<<"Hello+Günter">>, []}, <<"Hello%2BG%C3%BCnter">>},
             {{<<"Hello ">>, []}, <<"Hello+">>},
             {{<<"Hello ">>, [noplus]}, <<"Hello%20">>}
             ],
@@ -303,7 +395,7 @@ normalize_test_() ->
          "%E3%81%AA%E3%81%8C%E3%81%8F%E3%81%97%E3%81%AA%E3%81%84%E3%81%A8%E3" ++
          "%81%9F%E3%82%8A%E3%81%AA%E3%81%84.w3.mag.keio.ac.jp",
          << "http://www.xn--n8jaaaaai5bhf7as8fsfk3jnknefdde3f",
-           "g11amb5gzdb4wi9bya3kc6lra.w3.mag.keio.ac.jp/" >>}],
+           "g11amb5gzdb4wi9bya3kc6lra.w3.mag.keio.ac.jp" >>}],
     [{V, fun() -> R = hackney_url:unparse_url(hackney_url:normalize(V))
             end} || {V, R} <- Tests].
 

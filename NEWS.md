@@ -1,23 +1,73 @@
 # NEWS
 
+1.17.0 - 2020-12-19
+-------------------
+
+- fix SSL compatibility with erlang OTP 23
+- handle empty trailers 
+- fix race condition in connection pool
+- fix memory leak in connection pool
+- IDNA update to unicode 13.0.0
+- fix build on macosx with OTP >= 20.1
+- fix network Location on redirect
+- produce uppercase hexadecimal in URLS
+- pool queue count metric is now named `queue_count`
+- miscellaneous fixes in documentation
+
+
+** possible breaking change **  
+
+- pool queue count metric is now named `queue_count`. You should update your dashboard to reflect it.
+
+- possible breacking changes when producing uppercase hexadecimal in urls
+
+This change the behaviour of urlencode and pathencode to produce
+uppercase hexadecimal to comply to the RFC3986 which may affect 
+systems using URL as signature or in an hash.
+
+1.16.0 - 2020-05-25
+-------------------
+
+
+- pool: cache connection IDs
+- pool: make sure to reuse a connection if the options match the one given in the request. fix usage with proxy and ssl
+  connections
+- url: handle fragment correctly, a fragment is parsed first to not be mistaken with an URL
+- ssl: fix validation with Erlang 19 & Erlang 20
+- ssl: handle tlsv1.3 on Erlang OTP 23
+- ssl: increase validation depth to match openssl default
+- ssl: optimiaz partial chain handling
+- ssl: fix hostname checking and correctly handle SNI
+- ssl: fix ciphers
+- request: fix regression with fully fqdn
+- ssl: fix usage with OTP 23
+- url: decode username/password for basic auth parameters
+- request: do not normalize when converting relative redirect to absolute
+- ssl: update to certifi 2.5.2
+- request: handle Connection: close response header for stteam
+- http: handle leading new lines in HTTP messages
+- http: handle trailers in persistent connection
+- pool: update pool timeout docummentation
+- url: fix urlencode
+
 1.15.2 - 2019-09-25
 -------------------
 
-- doc: fix tes run example in readme
-- fix: hackney stream, send `hackney_response` before calling `handle_error` 
+- doc: fix test run example in readme
+- fix: hackney stream, send `hackney_response` before calling `handle_error`
 - fix: error remove ssl `honor_cipher_order` option
 - doc: document self-signed certificate usage
-- bump `ssl_verify_fun` to 1.1.5 
+- bump `ssl_verify_fun` to 1.1.5
 - fix: don't use default pool if set to false
 - fix: `hackney_headers_new:store/3`  fix value appending to a list
-- fix: miscellaeous specs
+- fix: miscellaneous specs
 - doc: miscellaneous improvements
 
 
 1.15.1 - 2019-02-26
 -------------------
 
-- fix: don't try to encode encode to IDN with full ASCII names.
+- fix: don't try to encode to IDN with full ASCII names.
 
 > this behaviour is similar to curl and fix errors some people had with docker
 > creating domain names containing a `_`
@@ -93,7 +143,7 @@
 - fix: change when hackney loads the hackney metric module (speed improvement)
 - fix: return value from the function `del_from_queue` in connection pool
 - fix: handle empty or invalid content-length
-- fix documentation on removed method
+- fix: documentation on removed method
 
 
 1.10.1 - 2017-10-20

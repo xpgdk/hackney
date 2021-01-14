@@ -29,7 +29,7 @@ qs_opt() = noplus | upper
 
 
 <pre><code>
-qs_vals() = [{binary(), binary() | true}]
+qs_vals() = [{binary() | atom() | list() | integer(), binary() | true}]
 </code></pre>
 
 <a name="index"></a>
@@ -38,7 +38,7 @@ qs_vals() = [{binary(), binary() | true}]
 
 
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#fix_path-1">fix_path/1</a></td><td></td></tr><tr><td valign="top"><a href="#idnconvert_hostname-1">idnconvert_hostname/1</a></td><td></td></tr><tr><td valign="top"><a href="#make_url-3">make_url/3</a></td><td>Construct an URL from a base URL, a path and a list of
-properties to give to the URL.</td></tr><tr><td valign="top"><a href="#normalize-1">normalize/1</a></td><td>Normalizes the encoding of an URL.</td></tr><tr><td valign="top"><a href="#normalize-2">normalize/2</a></td><td>Normalizes the encoding of an URL.</td></tr><tr><td valign="top"><a href="#parse_qs-1">parse_qs/1</a></td><td></td></tr><tr><td valign="top"><a href="#parse_url-1">parse_url/1</a></td><td>Parse an URL and return a #hackney_url record.</td></tr><tr><td valign="top"><a href="#pathencode-1">pathencode/1</a></td><td>Encode an URL path.</td></tr><tr><td valign="top"><a href="#qs-1">qs/1</a></td><td>Encode query properties to binary.</td></tr><tr><td valign="top"><a href="#qs-2">qs/2</a></td><td>Encode query properties to binary.</td></tr><tr><td valign="top"><a href="#transport_scheme-1">transport_scheme/1</a></td><td></td></tr><tr><td valign="top"><a href="#unparse_url-1">unparse_url/1</a></td><td></td></tr><tr><td valign="top"><a href="#urldecode-1">urldecode/1</a></td><td>Decode an URL encoded binary.</td></tr><tr><td valign="top"><a href="#urldecode-2">urldecode/2</a></td><td>Decode an URL encoded binary.</td></tr><tr><td valign="top"><a href="#urlencode-1">urlencode/1</a></td><td>URL encode a string binary.</td></tr><tr><td valign="top"><a href="#urlencode-2">urlencode/2</a></td><td>URL encode a string binary.</td></tr></table>
+properties to give to the URL.</td></tr><tr><td valign="top"><a href="#normalize-1">normalize/1</a></td><td>Normalizes the encoding of an URL.</td></tr><tr><td valign="top"><a href="#normalize-2">normalize/2</a></td><td>Normalizes the encoding of an URL.</td></tr><tr><td valign="top"><a href="#parse_qs-1">parse_qs/1</a></td><td></td></tr><tr><td valign="top"><a href="#parse_url-1">parse_url/1</a></td><td>Parse an URL and return a #hackney_url record.</td></tr><tr><td valign="top"><a href="#pathencode-1">pathencode/1</a></td><td>Encode an URL path.</td></tr><tr><td valign="top"><a href="#property-2">property/2</a></td><td></td></tr><tr><td valign="top"><a href="#qs-1">qs/1</a></td><td>Encode query properties to binary.</td></tr><tr><td valign="top"><a href="#qs-2">qs/2</a></td><td>Encode query properties to binary.</td></tr><tr><td valign="top"><a href="#transport_scheme-1">transport_scheme/1</a></td><td></td></tr><tr><td valign="top"><a href="#unparse_url-1">unparse_url/1</a></td><td></td></tr><tr><td valign="top"><a href="#urldecode-1">urldecode/1</a></td><td>Decode an URL encoded binary.</td></tr><tr><td valign="top"><a href="#urldecode-2">urldecode/2</a></td><td>Decode an URL encoded binary.</td></tr><tr><td valign="top"><a href="#urlencode-1">urlencode/1</a></td><td>URL encode a string binary.</td></tr><tr><td valign="top"><a href="#urlencode-2">urlencode/2</a></td><td>URL encode a string binary.</td></tr></table>
 
 
 <a name="functions"></a>
@@ -119,13 +119,19 @@ Parse an URL and return a #hackney_url record.
 ### pathencode/1 ###
 
 <pre><code>
-pathencode(Bin::binary()) -&gt; binary()
+pathencode(Path::binary() | list()) -&gt; binary()
 </code></pre>
 <br />
 
 Equivalent to [`pathencode(Bin, [])`](#pathencode-2).
 
 Encode an URL path.
+
+<a name="property-2"></a>
+
+### property/2 ###
+
+`property(X1, URL) -> any()`
 
 <a name="qs-1"></a>
 
@@ -211,7 +217,7 @@ urlencode(Bin::binary() | string(), Opts::[<a href="#type-qs_opt">qs_opt()</a>])
 
 URL encode a string binary.
 The `noplus` option disables the default behaviour of quoting space
-characters, `\s`, as `+`. The `upper` option overrides the default behaviour
-of writing hex numbers using lowecase letters to using uppercase letters
+characters, `\s`, as `+`. The `lower` option overrides the default behaviour
+of writing hex numbers using uppercase letters to using lowercase letters
 instead.
 
